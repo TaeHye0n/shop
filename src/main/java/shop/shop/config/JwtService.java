@@ -21,7 +21,7 @@ public class JwtService {
     @Value("${spring.security.jwt.secret}")
     private String secretKey;
 
-    public String extractusername(String token) {
+    public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -48,7 +48,7 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractusername(token);
+        final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
