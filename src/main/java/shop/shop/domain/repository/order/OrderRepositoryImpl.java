@@ -1,4 +1,9 @@
 package shop.shop.domain.repository.order;
 
-public class OrderRepositoryImpl implements OrderRepositoryCustom{
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+@Repository
+@RequiredArgsConstructor
+public class OrderRepositoryImpl implements OrderRepositoryCustom {
 }

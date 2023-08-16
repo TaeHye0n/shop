@@ -1,9 +1,9 @@
-package shop.shop.domain.repository.member;
+package shop.shop.domain.repository.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class MemberRepositoryImpl implements MemberRepositoryCustom{
+public class ItemRepositoryImpl implements ItemRepositoryCustom {
 }
