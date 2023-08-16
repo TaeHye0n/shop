@@ -26,4 +26,36 @@ public class OrderItemMap {
     private int count;
 
     private int orderPrice;
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    private void setItem(Item item) {
+        this.item = item;
+    }
+
+    private void setCount(int count) {
+        this.count = count;
+    }
+
+    private void setOrderPrice(int orderPrice) {
+        this.orderPrice = orderPrice;
+    }
+
+    //정적 팩토리 메서드
+    public static OrderItemMap createOrderItemMap(Item item, int orderPrice, int count) {
+        OrderItemMap orderItemMap = new OrderItemMap();
+        orderItemMap.setItem(item);
+        orderItemMap.setOrderPrice(orderPrice);
+        orderItemMap.setCount(count);
+
+        item.removeStock(count);
+
+        return orderItemMap;
+    }
+
+    public int getTotalPrice() {
+        return getOrderPrice() * getCount();
+    }
 }

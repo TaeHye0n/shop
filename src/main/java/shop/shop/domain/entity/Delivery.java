@@ -22,4 +22,14 @@ public class Delivery extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "delivery")
     private Order order;
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    @Builder
+    public Delivery(Address address, DeliveryStatus deliveryStatus) {
+        this.address = address;
+        this.deliveryStatus = deliveryStatus;
+    }
 }
