@@ -57,7 +57,10 @@ public class Member extends BaseEntity implements UserDetails {
         this.phone = phone;
         this.age = age;
         this.address = address;
-        this.role = Role.USER;
+    }
+
+    public void changeRole(Role role) {
+        this.role = role;
     }
 
     public void encodePassword(PasswordEncoder passwordEncoder) {

@@ -1,6 +1,7 @@
 package shop.shop.controller.item.dto.request;
 
 import lombok.*;
+import shop.shop.domain.entity.Member;
 import shop.shop.domain.entity.enums.Quality;
 import shop.shop.domain.entity.item.Item;
 
@@ -16,7 +17,6 @@ public class ItemRequestDto {
         private int stock;
         private Quality quality;
 
-        @Builder
         public Item toEntity() {
             return Item.builder()
                     .name(name)

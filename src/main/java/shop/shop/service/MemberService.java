@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shop.shop.Role;
 import shop.shop.config.JwtService;
 import shop.shop.domain.entity.Member;
 import shop.shop.domain.repository.member.MemberRepository;
@@ -31,6 +32,7 @@ public class MemberService {
     @Transactional
     public Long register(MemberRegisterRequest request) {
         Member member = request.toEntity();
+        member.changeRole(Role.USER);
         member.encodePassword(passwordEncoder);
         memberRepository.save(member);
         return member.getId();
