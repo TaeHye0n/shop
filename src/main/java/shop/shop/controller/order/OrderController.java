@@ -4,11 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import shop.shop.controller.order.dto.request.OrderRequestDto;
+import shop.shop.exception.CustomAccessDeniedException;
 import shop.shop.service.OrderService;
 
 @RestController
@@ -18,8 +16,10 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @PostMapping
-    public ResponseEntity order (@RequestBody @Valid OrderRequestDto.OrderCreateRequest orderCreateRequest) {
-        return new ResponseEntity(orderService.order(orderCreateRequest), HttpStatus.CREATED);
+    @PostMapping("/{memberId}")
+    public ResponseEntity order (
+            @RequestParam Long memberId,
+            @RequestBody @Valid OrderRequestDto.OrderCreateRequest orderCreateRequest) throws CustomAccessDeniedException {
+        return new ResponseEntity(orderService.order(memberId, orderCreateRequest), HttpStatus.CREATED);
     }
 }

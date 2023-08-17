@@ -11,8 +11,6 @@ public class OrderRequestDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class OrderCreateRequest {
-        private Long memberId;
-
         private List<ItemAndCount> itemAndCounts;
 
         @Data
