@@ -2,7 +2,6 @@ package shop.shop.component;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import shop.shop.domain.entity.Member;
 import shop.shop.exception.CustomAuthenticationException;
