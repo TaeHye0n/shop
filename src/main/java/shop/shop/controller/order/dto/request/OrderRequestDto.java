@@ -18,7 +18,7 @@ public class OrderRequestDto {
         @AllArgsConstructor
         @NoArgsConstructor
         public static class ItemAndCount {
-            private Long ItemId;
+            private Long itemId;
             private int count;
         }
     }

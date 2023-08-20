@@ -8,6 +8,7 @@ import shop.shop.component.SecurityContextUtil;
 import shop.shop.domain.entity.Member;
 import shop.shop.domain.entity.item.Item;
 import shop.shop.domain.repository.item.ItemRepository;
+import shop.shop.domain.repository.member.MemberRepository;
 import shop.shop.exception.CustomAccessDeniedException;
 
 import static shop.shop.controller.item.dto.request.ItemRequestDto.*;
@@ -18,6 +19,7 @@ import static shop.shop.controller.item.dto.request.ItemRequestDto.*;
 public class ItemService {
 
     private final ItemRepository itemRepository;
+    private final MemberRepository memberRepository;
     private final SecurityContextUtil securityContextUtil;
 
     @Transactional

@@ -18,7 +18,7 @@ public class OrderController {
 
     @PostMapping("/{memberId}")
     public ResponseEntity order (
-            @RequestParam Long memberId,
+            @PathVariable Long memberId,
             @RequestBody @Valid OrderRequestDto.OrderCreateRequest orderCreateRequest) throws CustomAccessDeniedException {
         return new ResponseEntity(orderService.order(memberId, orderCreateRequest), HttpStatus.CREATED);
     }

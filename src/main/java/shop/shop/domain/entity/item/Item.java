@@ -33,8 +33,7 @@ public class Item {
     private Member member;
 
     @Builder
-    public Item(Member member, String name, int price, int stock, Quality quality) {
-        this.setMember(member);
+    public Item(String name, int price, int stock, Quality quality) {
         this.name = name;
         this.price = price;
         this.stock = stock;
