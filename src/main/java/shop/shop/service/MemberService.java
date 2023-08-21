@@ -1,6 +1,7 @@
 package shop.shop.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import static shop.shop.controller.member.dto.request.MemberRequestDto.*;
 import static shop.shop.controller.member.dto.response.MemberResponseDto.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -31,11 +33,19 @@ public class MemberService {
 
     @Transactional
     public Long register(MemberRegisterRequest request) {
+        validateDuplicateMember(request.getEmail());
         Member member = request.toEntity();
         member.changeRole(Role.USER);
         member.encodePassword(passwordEncoder);
-        memberRepository.save(member);
-        return member.getId();
+        Member savedMember = memberRepository.save(member);
+        return savedMember.getId();
+    }
+
+    private void validateDuplicateMember(String email) {
+        Optional<Member> findMember = memberRepository.findByEmail(email);
+        if (findMember.isPresent()) {
+            throw new IllegalStateException("이미 존재하는 회원입니다.");
+        }
     }
 
     public AuthenticationResponse signIn(MemberSignInRequest request) {
