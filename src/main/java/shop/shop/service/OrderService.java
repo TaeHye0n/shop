@@ -73,9 +73,9 @@ public class OrderService {
             }
 
             Order order = Order.createOrder(member, delivery, orderItemMapList);
-            orderRepository.save(order);
+            Order savedOrder = orderRepository.save(order);
 
-            return order.getId();
+            return savedOrder.getId();
         } else throw new CustomAccessDeniedException("Access denied");
     }
 }
