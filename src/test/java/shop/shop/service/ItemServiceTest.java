@@ -1,16 +1,15 @@
 package shop.shop.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import shop.shop.component.SecurityContextUtil;
-import shop.shop.controller.item.dto.request.ItemRequestDto;
 import shop.shop.domain.entity.Member;
 import shop.shop.domain.entity.enums.Quality;
 import shop.shop.domain.entity.item.Item;
@@ -23,6 +22,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static shop.shop.controller.item.dto.request.ItemRequestDto.*;
 
@@ -41,7 +41,7 @@ class ItemServiceTest {
 
     @Mock
     private SecurityContextUtil securityContextUtil;
-    
+
     @Test
     @DisplayName("상품등록 성공")
     void 상품등록성공() throws Exception {
@@ -53,17 +53,14 @@ class ItemServiceTest {
                 .price(10000)
                 .stock(100)
                 .build();
-        Item item = request.toEntity();
-        Member member = Member.builder()
-                .email("test@test.com")
-                .password("test123")
-                .build();
+        Item item = createTestItem();
+        Member member = createTestMember();
         ReflectionTestUtils.setField(member, "id", 1L);
         ReflectionTestUtils.setField(item, "id", 1L);
+        given(securityContextUtil.getCurrentMember()).willReturn(member);
+        given(itemRepository.save(any(Item.class))).willReturn(item);
 
         //when
-        when(securityContextUtil.getCurrentMember()).thenReturn(member);
-        when(itemRepository.save(any(Item.class))).thenReturn(item);
         Long itemId = itemService.addItems(memberId, request);
 
         //then
@@ -83,38 +80,27 @@ class ItemServiceTest {
                 .price(10000)
                 .stock(100)
                 .build();
-        Item item = request.toEntity();
-        Member member = Member.builder()
-                .email("test@test.com")
-                .password("test123")
-                .build();
+        Item item = createTestItem();
+        Member member = createTestMember();
         ReflectionTestUtils.setField(member, "id", 2L);
         ReflectionTestUtils.setField(item, "id", 1L);
+        given(securityContextUtil.getCurrentMember()).willReturn(member);
 
         //when
-        when(securityContextUtil.getCurrentMember()).thenReturn(member);
 
         //then
         assertThrows(CustomAccessDeniedException.class, () -> itemService.addItems(memberId, request));
         verify(securityContextUtil, times(1)).getCurrentMember();
     }
-    
+
     @Test
     @DisplayName("상품수정 성공")
     void 상품수정성공() throws Exception {
         //given
         Long memberId = 1L;
         Long itemId = 1L;
-        Item item = ItemCreateRequest.builder()
-                .name("Test")
-                .quality(Quality.NEW)
-                .price(10000)
-                .stock(100)
-                .build().toEntity();
-        Member member = Member.builder()
-                .email("test@test.com")
-                .password("test123")
-                .build();
+        Item item = createTestItem();
+        Member member = createTestMember();
         ReflectionTestUtils.setField(member, "id", 1L);
         ReflectionTestUtils.setField(item, "id", 1L);
         ItemUpdateRequest request = ItemUpdateRequest.builder()
@@ -122,16 +108,18 @@ class ItemServiceTest {
                 .quality(Quality.D)
                 .stock(1)
                 .build();
+        given(securityContextUtil.getCurrentMember()).willReturn(member);
+        given(itemRepository.findById(anyLong())).willReturn(Optional.of(item));
 
         //when
-        when(securityContextUtil.getCurrentMember()).thenReturn(member);
-        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
         Long savedItemId = itemService.updateItem(memberId, itemId, request);
 
         //then
         assertThat(savedItemId).isEqualTo(itemId);
         assertThat(item.getName()).isEqualTo("Test2");
         assertThat(item.getPrice()).isEqualTo(10000);
+        assertThat(item.getQuality()).isEqualTo(Quality.D);
+        assertThat(item.getStock()).isEqualTo(1);
         verify(securityContextUtil, times(1)).getCurrentMember();
         verify(itemRepository, times(1)).findById(anyLong());
     }
@@ -142,16 +130,8 @@ class ItemServiceTest {
         //given
         Long memberId = 1L;
         Long itemId = 1L;
-        Item item = ItemCreateRequest.builder()
-                .name("Test")
-                .quality(Quality.NEW)
-                .price(10000)
-                .stock(100)
-                .build().toEntity();
-        Member member = Member.builder()
-                .email("test@test.com")
-                .password("test123")
-                .build();
+        Item item = createTestItem();
+        Member member = createTestMember();
         ReflectionTestUtils.setField(member, "id", 2L);
         ReflectionTestUtils.setField(item, "id", 1L);
         ItemUpdateRequest request = ItemUpdateRequest.builder()
@@ -159,9 +139,9 @@ class ItemServiceTest {
                 .quality(Quality.D)
                 .stock(1)
                 .build();
+        given(securityContextUtil.getCurrentMember()).willReturn(member);
 
         //when
-        when(securityContextUtil.getCurrentMember()).thenReturn(member);
 
         //then
         assertThrows(CustomAccessDeniedException.class, () -> itemService.updateItem(memberId, itemId, request));
@@ -174,16 +154,8 @@ class ItemServiceTest {
         //given
         Long memberId = 1L;
         Long itemId = 1L;
-        Item item = ItemCreateRequest.builder()
-                .name("Test")
-                .quality(Quality.NEW)
-                .price(10000)
-                .stock(100)
-                .build().toEntity();
-        Member member = Member.builder()
-                .email("test@test.com")
-                .password("test123")
-                .build();
+        Item item = createTestItem();
+        Member member = createTestMember();
         ReflectionTestUtils.setField(member, "id", 1L);
         ReflectionTestUtils.setField(item, "id", 1L);
         ItemUpdateRequest request = ItemUpdateRequest.builder()
@@ -191,10 +163,10 @@ class ItemServiceTest {
                 .quality(Quality.D)
                 .stock(1)
                 .build();
+        given(securityContextUtil.getCurrentMember()).willReturn(member);
+        given(itemRepository.findById(anyLong())).willReturn(Optional.empty());
 
         //when
-        when(securityContextUtil.getCurrentMember()).thenReturn(member);
-        when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //then
         assertThrows(EntityNotFoundException.class, () -> itemService.updateItem(memberId, itemId, request));
@@ -202,5 +174,22 @@ class ItemServiceTest {
         verify(itemRepository, times(1)).findById(anyLong());
     }
 
+    private Member createTestMember() {
+        Member member = Member.builder()
+                .email("test@test.com")
+                .password("test123")
+                .build();
+        return member;
+    }
+
+    private Item createTestItem() {
+        Item item = Item.builder()
+                .name("Test")
+                .quality(Quality.NEW)
+                .price(10000)
+                .stock(100)
+                .build();
+        return item;
+    }
 
 }
