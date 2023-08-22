@@ -3,6 +3,7 @@ package shop.shop.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -12,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
+import shop.shop.Role;
 import shop.shop.config.JwtService;
 import shop.shop.domain.entity.Member;
 import shop.shop.domain.repository.member.MemberRepository;
@@ -60,9 +62,12 @@ class MemberServiceTest {
 
         //when
         Long memberId = memberService.register(request);
-
-
+        
         //then
+        Member findMember = getMemberFromMemberRepository();
+        assertThat(findMember.getRole()).isEqualTo(Role.USER);
+        assertThat(findMember.getEmail()).isEqualTo(request.getEmail());
+        assertThat(findMember.getPassword()).isEqualTo("encodedPassword");
         assertThat(memberId).isEqualTo(1L);
         verify(memberRepository, times(1)).save(any(Member.class));
         verify(memberRepository, times(1)).findByEmail(request.getEmail());
@@ -128,7 +133,7 @@ class MemberServiceTest {
                 .willThrow(new UsernameNotFoundException("User not found"));
 
         //when
-        
+
         //then
         assertThrows(BadCredentialsException.class, () -> memberService.signIn(request));
     }
@@ -139,5 +144,11 @@ class MemberServiceTest {
                 .password(password)
                 .build();
         return member;
+    }
+
+    private Member getMemberFromMemberRepository() {
+        ArgumentCaptor<Member> memberCaptor = ArgumentCaptor.forClass(Member.class);
+        verify(memberRepository).save(memberCaptor.capture());
+        return memberCaptor.getValue();
     }
 }
