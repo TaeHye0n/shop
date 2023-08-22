@@ -28,8 +28,8 @@ public class ItemService {
         if (member.getId().equals(memberId)) {
             Item item = itemCreateRequest.toEntity();
             item.setMember(member);
-            itemRepository.save(item);
-            return item.getId();
+            Item savedItem = itemRepository.save(item);
+            return savedItem.getId();
         } else throw new CustomAccessDeniedException("Access Denied");
     }
 
