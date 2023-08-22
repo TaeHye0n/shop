@@ -15,7 +15,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id", nullable = false)
     private Long id;
 
@@ -62,6 +63,12 @@ public class Order extends BaseEntity {
 
         order.orderComplete();
         return order;
+    }
+
+    public int getTotalPrice() {
+        return orderItemMaps.stream()
+                .mapToInt(OrderItemMap::getTotalPrice)
+                .sum();
     }
 
 }
