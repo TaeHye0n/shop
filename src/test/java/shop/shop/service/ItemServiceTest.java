@@ -64,6 +64,12 @@ class ItemServiceTest {
         Long itemId = itemService.addItems(memberId, request);
 
         //then
+        Item findItem = getItemFromItemRepository();
+        assertThat(findItem.getMember()).isEqualTo(member);
+        assertThat(findItem.getName()).isEqualTo("Test");
+        assertThat(findItem.getQuality()).isEqualTo(Quality.NEW);
+        assertThat(findItem.getPrice()).isEqualTo(10000);
+        assertThat(findItem.getStock()).isEqualTo(100);
         assertThat(itemId).isEqualTo(1L);
         verify(securityContextUtil, times(1)).getCurrentMember();
         verify(itemRepository, times(1)).save(any(Item.class));
@@ -192,4 +198,9 @@ class ItemServiceTest {
         return item;
     }
 
+    private Item getItemFromItemRepository() {
+        ArgumentCaptor<Item> itemCaptor = ArgumentCaptor.forClass(Item.class);
+        verify(itemRepository).save(itemCaptor.capture());
+        return itemCaptor.getValue();
+    }
 }
