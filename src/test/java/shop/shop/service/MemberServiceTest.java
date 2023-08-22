@@ -21,6 +21,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static shop.shop.controller.member.dto.request.MemberRequestDto.*;
 import static shop.shop.controller.member.dto.response.MemberResponseDto.*;
@@ -51,13 +52,13 @@ class MemberServiceTest {
         MemberRegisterRequest request = new MemberRegisterRequest();
         request.setEmail("test@test.com");
         request.setPassword("test123");
-        Member member = request.toEntity();
+        Member member = createTestMember(request.getEmail(), request.getPassword());
         ReflectionTestUtils.setField(member, "id", 1L);
+        given(memberRepository.findByEmail(request.getEmail())).willReturn(Optional.empty());
+        given(passwordEncoder.encode(anyString())).willReturn("encodedPassword");
+        given(memberRepository.save(any(Member.class))).willReturn(member);
 
         //when
-        when(memberRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        when(memberRepository.save(any(Member.class))).thenReturn(member);
         Long memberId = memberService.register(request);
 
 
@@ -75,11 +76,11 @@ class MemberServiceTest {
         MemberRegisterRequest request = new MemberRegisterRequest();
         request.setEmail("test@test.com");
         request.setPassword("test123");
-        Member member = request.toEntity();
+        Member member = createTestMember(request.getEmail(), request.getPassword());
         ReflectionTestUtils.setField(member, "id", 1L);
+        given(memberRepository.findByEmail(request.getEmail())).willReturn(Optional.of(member));
 
         //when
-        when(memberRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(member));
 
         //then
         assertThrows(IllegalStateException.class, () -> memberService.register(request));
@@ -98,16 +99,12 @@ class MemberServiceTest {
                 .email(email)
                 .password(password)
                 .build();
-
-        Member member = Member.builder()
-                .email(email)
-                .password(password)
-                .build();
+        Member member = createTestMember(email, password);
+        given(authenticationManager.authenticate(any()))
+                .willReturn(new UsernamePasswordAuthenticationToken(member, password));
+        given(jwtService.generateToken(member)).willReturn(token);
 
         //when
-        when(authenticationManager.authenticate(any()))
-                .thenReturn(new UsernamePasswordAuthenticationToken(member, password));
-        when(jwtService.generateToken(member)).thenReturn(token);
         AuthenticationResponse response = memberService.signIn(request);
 
         //then
@@ -127,12 +124,20 @@ class MemberServiceTest {
                 .email(email)
                 .password(password)
                 .build();
+        given(authenticationManager.authenticate(any()))
+                .willThrow(new UsernameNotFoundException("User not found"));
 
         //when
-        when(authenticationManager.authenticate(any()))
-                .thenThrow(new UsernameNotFoundException("User not found"));
-
+        
         //then
         assertThrows(BadCredentialsException.class, () -> memberService.signIn(request));
+    }
+
+    private Member createTestMember(String email, String password) {
+        Member member = Member.builder()
+                .email(email)
+                .password(password)
+                .build();
+        return member;
     }
 }
