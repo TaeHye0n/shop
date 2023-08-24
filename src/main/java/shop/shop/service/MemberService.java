@@ -11,9 +11,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.shop.Role;
+import shop.shop.component.SecurityContextUtil;
 import shop.shop.config.JwtService;
 import shop.shop.domain.entity.Member;
 import shop.shop.domain.repository.member.MemberRepository;
+import shop.shop.exception.CustomAccessDeniedException;
 
 import java.util.Optional;
 
@@ -30,6 +32,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final SecurityContextUtil securityContextUtil;
 
     @Transactional
     public Long register(MemberRegisterRequest request) {
@@ -67,5 +70,19 @@ public class MemberService {
             // 인증 실패한 경우
             throw new BadCredentialsException("Authentication failed", ex);
         }
+    }
+
+    public MemberInfoResponse myInfo(Long memberId) throws CustomAccessDeniedException {
+        Member member = securityContextUtil.getCurrentMember();
+        if (member.getId().equals(memberId)) {
+            return MemberInfoResponse.builder()
+                    .address(member.getAddress())
+                    .age(member.getAge())
+                    .phone(member.getPhone())
+                    .role(member.getRole())
+                    .email(member.getEmail())
+                    .name(member.getName())
+                    .build();
+        } else throw new CustomAccessDeniedException("Access Denied");
     }
 }
