@@ -18,6 +18,7 @@ public class Delivery extends BaseEntity {
     private Address address;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private DeliveryStatus deliveryStatus;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "delivery")

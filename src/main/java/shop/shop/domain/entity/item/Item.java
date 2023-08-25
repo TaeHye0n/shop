@@ -19,13 +19,17 @@ public class Item {
     @Column(name = "item_id")
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private int price;
 
+    @Column(nullable = false)
     private int stock;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Quality quality;
 
     @ManyToOne(fetch = FetchType.LAZY)

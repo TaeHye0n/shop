@@ -23,8 +23,10 @@ public class OrderItemMap {
     @JoinColumn(name = "item_id")
     private Item item;
 
+    @Column(nullable = false)
     private int count;
 
+    @Column(nullable = false)
     private int orderPrice;
 
     public void setOrder(Order order) {

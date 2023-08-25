@@ -21,6 +21,7 @@ public class Order extends BaseEntity {
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private OrderStatus orderStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
