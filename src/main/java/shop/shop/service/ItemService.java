@@ -5,11 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.shop.component.SecurityContextUtil;
+import shop.shop.controller.item.dto.response.ItemResponseDto.ItemAllResponse;
 import shop.shop.domain.entity.Member;
 import shop.shop.domain.entity.item.Item;
 import shop.shop.domain.repository.item.ItemRepository;
 import shop.shop.domain.repository.member.MemberRepository;
 import shop.shop.exception.CustomAccessDeniedException;
+
+import java.util.List;
 
 import static shop.shop.controller.item.dto.request.ItemRequestDto.*;
 
@@ -63,4 +66,8 @@ public class ItemService {
     }
 
 
+    public List<ItemAllResponse> findAllItems(Long memberId) {
+        Member member = securityContextUtil.getCurrentMember();
+        return itemRepository.findAllMyItems(memberId);
+    }
 }
