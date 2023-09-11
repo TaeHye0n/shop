@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import shop.shop.component.SecurityContextUtil;
+import shop.shop.controller.item.dto.response.ItemResponseDto;
 import shop.shop.domain.entity.Member;
 import shop.shop.domain.entity.enums.Quality;
 import shop.shop.domain.entity.item.Item;
@@ -17,6 +18,8 @@ import shop.shop.domain.repository.item.ItemRepository;
 import shop.shop.domain.repository.member.MemberRepository;
 import shop.shop.exception.CustomAccessDeniedException;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -25,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static shop.shop.controller.item.dto.request.ItemRequestDto.*;
+import static shop.shop.controller.item.dto.response.ItemResponseDto.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ItemService Unit Test")
@@ -178,6 +182,39 @@ class ItemServiceTest {
         assertThrows(EntityNotFoundException.class, () -> itemService.updateItem(memberId, itemId, request));
         verify(securityContextUtil, times(1)).getCurrentMember();
         verify(itemRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("상품조회 성공")
+    void 내상품조회() throws Exception {
+        //given
+        Long memberId = 1L;
+        Member member = createTestMember();
+        ReflectionTestUtils.setField(member, "id", 1L);
+        ItemAllResponse itemAllResponse1 = ItemAllResponse.builder()
+                .id(1L)
+                .name("item1")
+                .stock(100)
+                .price(10000)
+                .quality(Quality.NEW)
+                .build();
+
+        ItemAllResponse itemAllResponse2 = ItemAllResponse.builder()
+                .id(2L)
+                .name("item2")
+                .stock(200)
+                .price(20000)
+                .quality(Quality.B)
+                .build();
+        List<ItemAllResponse> expectedResponse = List.of(itemAllResponse1, itemAllResponse2);
+        given(securityContextUtil.getCurrentMember()).willReturn(member);
+        given(itemRepository.findAllMyItems(memberId)).willReturn(expectedResponse);
+
+        //when
+        List<ItemAllResponse> actualResponse = itemService.findAllItems(memberId);
+
+        //then
+        assertThat(actualResponse).isEqualTo(expectedResponse);
     }
 
     private Member createTestMember() {
