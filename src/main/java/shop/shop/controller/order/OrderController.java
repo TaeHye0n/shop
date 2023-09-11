@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import shop.shop.common.response.Response;
 import shop.shop.controller.order.dto.request.OrderRequestDto;
 import shop.shop.exception.CustomAccessDeniedException;
 import shop.shop.service.OrderService;
@@ -17,9 +18,12 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/{memberId}")
-    public ResponseEntity order (
+    public ResponseEntity<Response<Long>> order (
             @PathVariable Long memberId,
             @RequestBody @Valid OrderRequestDto.OrderCreateRequest orderCreateRequest) throws CustomAccessDeniedException {
-        return new ResponseEntity(orderService.order(memberId, orderCreateRequest), HttpStatus.CREATED);
+        return ResponseEntity.ok(
+                Response.of(orderService.order(memberId, orderCreateRequest),
+                "주문 성공")
+        );
     }
 }
