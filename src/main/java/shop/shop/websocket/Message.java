@@ -16,4 +16,5 @@ public class Message<T> {
     private String id;
     private String channelId;
     private String name;
+    private String content;
 }
